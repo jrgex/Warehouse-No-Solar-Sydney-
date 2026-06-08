@@ -4,7 +4,11 @@ Identifies and analyses warehouses in Greater Sydney (>500 m²) that have **no s
 
 <p align="center">
   <a href="https://jrgex.github.io/Warehouse-No-Solar-Sydney-/data/warehouses_map.html">
-    <img src="https://img.shields.io/badge/🗺️%20View%20Interactive%20Map-No--Solar%20Warehouses%20Sydney-blue?style=for-the-badge" alt="View Interactive Map" />
+    <img src="https://img.shields.io/badge/🗺️%20View%20Interactive%20Map-No--Solar%20Warehouses%20Sydney-1F3864?style=for-the-badge" alt="View Interactive Map" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/jrgex/Warehouse-No-Solar-Sydney-/raw/main/data/warehouses_no_solar.xlsx">
+    <img src="https://img.shields.io/badge/📊%20Warehouse%20Data-Download%20Excel-C55A11?style=for-the-badge" alt="Warehouse Data" />
   </a>
 </p>
 

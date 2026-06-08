@@ -2,6 +2,12 @@
 
 Identifies and analyses warehouses in Greater Sydney (>500 m²) that have **no solar panels** on their rooftops, then estimates their electricity costs and solar savings potential using AEMO NEM interval data and Ausgrid network tariffs.
 
+<p align="center">
+  <a href="https://jrgex.github.io/Warehouse-No-Solar-Sydney-/data/warehouses_map.html">
+    <img src="https://img.shields.io/badge/🗺️%20View%20Interactive%20Map-No--Solar%20Warehouses%20Sydney-blue?style=for-the-badge" alt="View Interactive Map" />
+  </a>
+</p>
+
 ---
 
 ## What it does

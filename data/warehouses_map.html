@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_7c005e98ca72ef2d3ada35fafdab670d {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css"/>
+</head>
+<body>
+    
+    
+    <div style="position:fixed;bottom:30px;left:30px;z-index:1000;
+                background:white;padding:12px 16px;border-radius:8px;
+                box-shadow:2px 2px 8px rgba(0,0,0,0.3);font-family:sans-serif;font-size:13px">
+      <b>Sydney Warehouses — No Solar</b><br>
+      <span style="color:#e05c00">●</span> &nbsp;Large (&gt;5 000 m²)<br>
+      <span style="color:#e8a800">●</span> &nbsp;Medium (1 000–5 000 m²)<br>
+      <span style="color:#2a7ae2">●</span> &nbsp;Small (500–1 000 m²)<br>
+      <hr style="margin:6px 0">
+      <small>Circle size ∝ roof area &nbsp;|&nbsp; Click for details</small>
+    </div>
+    
+            <div class="folium-map" id="map_7c005e98ca72ef2d3ada35fafdab670d" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_7c005e98ca72ef2d3ada35fafdab670d = L.map(
+                "map_7c005e98ca72ef2d3ada35fafdab670d",
+                {
+                    center: [-34.075949144898736, 150.7093938350475],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 11,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_be687937a2029a1f79b906535923bdfa = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_be687937a2029a1f79b906535923bdfa.addTo(map_7c005e98ca72ef2d3ada35fafdab670d);
+        
+    
+            var marker_cluster_593c1fcc780f1253d0666251f22390f9 = L.markerClusterGroup(
+                {
+  "maxClusterRadius": 50,
+  "disableClusteringAtZoom": 14,
+}
+            );
+        
+    
+            var circle_marker_efe1620dacf894bb897f45d82cc7135c = L.circleMarker(
+                [-34.04069232340426, 150.763855293617],
+                {"bubblingMouseEvents": true, "color": "#e05c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e05c00", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 40, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_a4051bc3cab11dc411fd3caea0ac5031 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_368891160ec9ad736c24cb38e33c430a = $(`<div id="html_368891160ec9ad736c24cb38e33c430a" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">Coles CDC</b><br>           <span style="color:#555">Hartley Road, Smeaton Grange, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>66,474 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">314655990</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">4,985,588 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$1,155,864</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>6.2 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.040692, 150.763855           </div>         </div></div>`)[0];
+                popup_a4051bc3cab11dc411fd3caea0ac5031.setContent(html_368891160ec9ad736c24cb38e33c430a);
+            
+        
+
+        circle_marker_efe1620dacf894bb897f45d82cc7135c.bindPopup(popup_a4051bc3cab11dc411fd3caea0ac5031)
+        ;
+
+        
+    
+    
+            circle_marker_efe1620dacf894bb897f45d82cc7135c.bindTooltip(
+                `<div>
+                     Coles CDC — 66,474 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f323f62da419ae078d782d2b4277c125 = L.circleMarker(
+                [-34.038326260000005, 150.75845606],
+                {"bubblingMouseEvents": true, "color": "#e05c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e05c00", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 40, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_6a42a67e184843aa5fb30f22223712e6 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_83fd0c29cdf566e4d9e6af6a9ff14c6c = $(`<div id="html_83fd0c29cdf566e4d9e6af6a9ff14c6c" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Anzac Avenue, Smeaton Grange, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>13,339 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">314655992</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">1,000,418 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$233,173</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>6.1 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.038326, 150.758456           </div>         </div></div>`)[0];
+                popup_6a42a67e184843aa5fb30f22223712e6.setContent(html_83fd0c29cdf566e4d9e6af6a9ff14c6c);
+            
+        
+
+        circle_marker_f323f62da419ae078d782d2b4277c125.bindPopup(popup_6a42a67e184843aa5fb30f22223712e6)
+        ;
+
+        
+    
+    
+            circle_marker_f323f62da419ae078d782d2b4277c125.bindTooltip(
+                `<div>
+                     nan — 13,339 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ed5db3a9ad8f15c9f6a28786945a40a6 = L.circleMarker(
+                [-34.0391901, 150.75458917999998],
+                {"bubblingMouseEvents": true, "color": "#e05c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e05c00", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 40, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_1db0748f97d0ac751f254e8c2b5feef1 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_1af055ffa87b2c70db4b6c88f443dcfc = $(`<div id="html_1af055ffa87b2c70db4b6c88f443dcfc" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Hartley Road, Smeaton Grange, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>11,514 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">314655988</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">863,558 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$201,486</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>6.1 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.039190, 150.754589           </div>         </div></div>`)[0];
+                popup_1db0748f97d0ac751f254e8c2b5feef1.setContent(html_1af055ffa87b2c70db4b6c88f443dcfc);
+            
+        
+
+        circle_marker_ed5db3a9ad8f15c9f6a28786945a40a6.bindPopup(popup_1db0748f97d0ac751f254e8c2b5feef1)
+        ;
+
+        
+    
+    
+            circle_marker_ed5db3a9ad8f15c9f6a28786945a40a6.bindTooltip(
+                `<div>
+                     nan — 11,514 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9098c9d17a43a2c427e12ad0de45111d = L.circleMarker(
+                [-34.04143269642857, 150.75572836785713],
+                {"bubblingMouseEvents": true, "color": "#e05c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e05c00", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 40, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_6c8e7712393f2c8954af6cf19c61369f = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_3281d083736eaf66d645707a16f8a1c7 = $(`<div id="html_3281d083736eaf66d645707a16f8a1c7" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">101, Smeaton Grange Road, Smeaton Grange, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>9,228 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">314655985</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">692,085 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$161,785</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>6.1 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.041433, 150.755728           </div>         </div></div>`)[0];
+                popup_6c8e7712393f2c8954af6cf19c61369f.setContent(html_3281d083736eaf66d645707a16f8a1c7);
+            
+        
+
+        circle_marker_9098c9d17a43a2c427e12ad0de45111d.bindPopup(popup_6c8e7712393f2c8954af6cf19c61369f)
+        ;
+
+        
+    
+    
+            circle_marker_9098c9d17a43a2c427e12ad0de45111d.bindTooltip(
+                `<div>
+                     nan — 9,228 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b65b3a548ee63eb2188413daf4cb4be6 = L.circleMarker(
+                [-34.03930986666666, 150.7593928],
+                {"bubblingMouseEvents": true, "color": "#e05c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e05c00", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 40, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_86425960bdcae2031b7a2e6394027190 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_124f02ddc34bdfc63f76c7bb5f3b2988 = $(`<div id="html_124f02ddc34bdfc63f76c7bb5f3b2988" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Hartley Road, Smeaton Grange, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>7,377 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">314655984</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">553,305 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$129,653</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>6.1 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.039310, 150.759393           </div>         </div></div>`)[0];
+                popup_86425960bdcae2031b7a2e6394027190.setContent(html_124f02ddc34bdfc63f76c7bb5f3b2988);
+            
+        
+
+        circle_marker_b65b3a548ee63eb2188413daf4cb4be6.bindPopup(popup_86425960bdcae2031b7a2e6394027190)
+        ;
+
+        
+    
+    
+            circle_marker_b65b3a548ee63eb2188413daf4cb4be6.bindTooltip(
+                `<div>
+                     nan — 7,377 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d1f6291f7e94a8a4ff043764c40b4fd5 = L.circleMarker(
+                [-34.03857134, 150.75995016],
+                {"bubblingMouseEvents": true, "color": "#e05c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e05c00", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 40, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_198cb8dea1b5050cacba343dba821552 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_9705b83b1ee96dafdf3bee5f5c3f3dd7 = $(`<div id="html_9705b83b1ee96dafdf3bee5f5c3f3dd7" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">10, Bluett Drive, Smeaton Grange, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>6,102 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">314655987</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">457,620 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$107,499</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>6.1 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.038571, 150.759950           </div>         </div></div>`)[0];
+                popup_198cb8dea1b5050cacba343dba821552.setContent(html_9705b83b1ee96dafdf3bee5f5c3f3dd7);
+            
+        
+
+        circle_marker_d1f6291f7e94a8a4ff043764c40b4fd5.bindPopup(popup_198cb8dea1b5050cacba343dba821552)
+        ;
+
+        
+    
+    
+            circle_marker_d1f6291f7e94a8a4ff043764c40b4fd5.bindTooltip(
+                `<div>
+                     nan — 6,102 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_02320f6085be972dd7f5470d7dab1d61 = L.circleMarker(
+                [-34.03904704, 150.75791704],
+                {"bubblingMouseEvents": true, "color": "#e05c00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e05c00", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 40, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_adb89a2949dc0c93c866877c655904ea = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_9ae1658acfbd4a3cff5ba98c89c7ba8f = $(`<div id="html_9ae1658acfbd4a3cff5ba98c89c7ba8f" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Hartley Road, Smeaton Grange, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>5,900 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">314655991</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">442,478 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$103,993</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>6.1 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.039047, 150.757917           </div>         </div></div>`)[0];
+                popup_adb89a2949dc0c93c866877c655904ea.setContent(html_9ae1658acfbd4a3cff5ba98c89c7ba8f);
+            
+        
+
+        circle_marker_02320f6085be972dd7f5470d7dab1d61.bindPopup(popup_adb89a2949dc0c93c866877c655904ea)
+        ;
+
+        
+    
+    
+            circle_marker_02320f6085be972dd7f5470d7dab1d61.bindTooltip(
+                `<div>
+                     nan — 5,900 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_cb9460b0cf14b8cea0b5dd1584033c28 = L.circleMarker(
+                [-34.03785362, 150.75695884],
+                {"bubblingMouseEvents": true, "color": "#e8a800", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e8a800", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 40, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_1e20abc2df08173bc961021455e7c51d = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_2003c126e59a1a537439f279d045c433 = $(`<div id="html_2003c126e59a1a537439f279d045c433" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Anzac Avenue, Smeaton Grange, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>4,879 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">314655989</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">365,948 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$86,274</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>6.1 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.037854, 150.756959           </div>         </div></div>`)[0];
+                popup_1e20abc2df08173bc961021455e7c51d.setContent(html_2003c126e59a1a537439f279d045c433);
+            
+        
+
+        circle_marker_cb9460b0cf14b8cea0b5dd1584033c28.bindPopup(popup_1e20abc2df08173bc961021455e7c51d)
+        ;
+
+        
+    
+    
+            circle_marker_cb9460b0cf14b8cea0b5dd1584033c28.bindTooltip(
+                `<div>
+                     nan — 4,879 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c3e312030631a4b5afc0e38a6e22d43f = L.circleMarker(
+                [-34.040523489473685, 150.7563022263158],
+                {"bubblingMouseEvents": true, "color": "#e8a800", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e8a800", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 35.15836827655926, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_805d15070d854fdb17c4cd119b1abd14 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_7afc3d8c12c428e7af01db1b5de3127f = $(`<div id="html_7afc3d8c12c428e7af01db1b5de3127f" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Anzac Avenue, Smeaton Grange, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>3,446 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">314655986</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">258,442 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$61,383</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>6.0 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.040523, 150.756302           </div>         </div></div>`)[0];
+                popup_805d15070d854fdb17c4cd119b1abd14.setContent(html_7afc3d8c12c428e7af01db1b5de3127f);
+            
+        
+
+        circle_marker_c3e312030631a4b5afc0e38a6e22d43f.bindPopup(popup_805d15070d854fdb17c4cd119b1abd14)
+        ;
+
+        
+    
+    
+            circle_marker_c3e312030631a4b5afc0e38a6e22d43f.bindTooltip(
+                `<div>
+                     nan — 3,446 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0e6b552ab346017b8f7b856119d96314 = L.circleMarker(
+                [-34.19627342093023, 150.6354160255814],
+                {"bubblingMouseEvents": true, "color": "#e8a800", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e8a800", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 34.13373987612174, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_ca5f4f45b897c7e500309775fe5f899d = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_ab50bc081d94f3d5a88d28630e48a63e = $(`<div id="html_ab50bc081d94f3d5a88d28630e48a63e" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Maldon Bridge Road, Picton, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>3,227 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">48628097</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">242,002 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$57,577</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>6.0 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.196273, 150.635416           </div>         </div></div>`)[0];
+                popup_ca5f4f45b897c7e500309775fe5f899d.setContent(html_ab50bc081d94f3d5a88d28630e48a63e);
+            
+        
+
+        circle_marker_0e6b552ab346017b8f7b856119d96314.bindPopup(popup_ca5f4f45b897c7e500309775fe5f899d)
+        ;
+
+        
+    
+    
+            circle_marker_0e6b552ab346017b8f7b856119d96314.bindTooltip(
+                `<div>
+                     nan — 3,227 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c6c7d3e2670773528efa2a29b1248f5a = L.circleMarker(
+                [-34.0608831, 150.69193528888889],
+                {"bubblingMouseEvents": true, "color": "#e8a800", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e8a800", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 28.595438191047513, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_e84b1fdd5034023f8ef986160d0f714e = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_7ddbbd1fe8df84ace553b524ce6753c8 = $(`<div id="html_7ddbbd1fe8df84ace553b524ce6753c8" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Little Street, Camden, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>2,177 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">1299908543</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">163,290 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$39,352</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>5.9 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.060883, 150.691935           </div>         </div></div>`)[0];
+                popup_e84b1fdd5034023f8ef986160d0f714e.setContent(html_7ddbbd1fe8df84ace553b524ce6753c8);
+            
+        
+
+        circle_marker_c6c7d3e2670773528efa2a29b1248f5a.bindPopup(popup_e84b1fdd5034023f8ef986160d0f714e)
+        ;
+
+        
+    
+    
+            circle_marker_c6c7d3e2670773528efa2a29b1248f5a.bindTooltip(
+                `<div>
+                     nan — 2,177 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_459625d2a82f4b358ce11ef58c86adc0 = L.circleMarker(
+                [-34.05207492, 150.69937646],
+                {"bubblingMouseEvents": true, "color": "#e8a800", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e8a800", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 25.25085194970821, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_3724beb1f11187eca4e3a2083e96757b = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_93818095661923faa0c36038ce4be1ad = $(`<div id="html_93818095661923faa0c36038ce4be1ad" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Edward Street, Camden, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>1,651 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">827468619</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">123,855 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$30,222</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>5.9 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.052075, 150.699376           </div>         </div></div>`)[0];
+                popup_3724beb1f11187eca4e3a2083e96757b.setContent(html_93818095661923faa0c36038ce4be1ad);
+            
+        
+
+        circle_marker_459625d2a82f4b358ce11ef58c86adc0.bindPopup(popup_3724beb1f11187eca4e3a2083e96757b)
+        ;
+
+        
+    
+    
+            circle_marker_459625d2a82f4b358ce11ef58c86adc0.bindTooltip(
+                `<div>
+                     nan — 1,651 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f33a67f93ac5ac71c0f40ab54faeb3b2 = L.circleMarker(
+                [-34.18009852857143, 150.5674917714286],
+                {"bubblingMouseEvents": true, "color": "#e8a800", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e8a800", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 24.491037098556642, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_b05beedde0681983a09069bb3abac439 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_e73e3990eaac57bacbff66f216da2dc1 = $(`<div id="html_e73e3990eaac57bacbff66f216da2dc1" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">269, Mulhollands Road, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>1,543 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">1494099155</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">115,725 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$28,340</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>5.8 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.180099, 150.567492           </div>         </div></div>`)[0];
+                popup_b05beedde0681983a09069bb3abac439.setContent(html_e73e3990eaac57bacbff66f216da2dc1);
+            
+        
+
+        circle_marker_f33a67f93ac5ac71c0f40ab54faeb3b2.bindPopup(popup_b05beedde0681983a09069bb3abac439)
+        ;
+
+        
+    
+    
+            circle_marker_f33a67f93ac5ac71c0f40ab54faeb3b2.bindTooltip(
+                `<div>
+                     nan — 1,543 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6dfa17529a53b3e958b3fee8ec99fd1d = L.circleMarker(
+                [-34.05182422857143, 150.6978126],
+                {"bubblingMouseEvents": true, "color": "#2a7ae2", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2a7ae2", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 19.622396431454167, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_ac708beee73627450cab3926fbf81b00 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_5bf57f294960b7b3c05bbcfc2b42ca48 = $(`<div id="html_5bf57f294960b7b3c05bbcfc2b42ca48" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Mitchell Street, Camden, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>943 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">827468622</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">70,718 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$17,919</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>5.6 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.051824, 150.697813           </div>         </div></div>`)[0];
+                popup_ac708beee73627450cab3926fbf81b00.setContent(html_5bf57f294960b7b3c05bbcfc2b42ca48);
+            
+        
+
+        circle_marker_6dfa17529a53b3e958b3fee8ec99fd1d.bindPopup(popup_ac708beee73627450cab3926fbf81b00)
+        ;
+
+        
+    
+    
+            circle_marker_6dfa17529a53b3e958b3fee8ec99fd1d.bindTooltip(
+                `<div>
+                     nan — 943 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_68ed562e9f5a87d99bcce82661674617 = L.circleMarker(
+                [-34.051660479999995, 150.69818837999998],
+                {"bubblingMouseEvents": true, "color": "#2a7ae2", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2a7ae2", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 19.25196489480014, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_0971502063a0c5822e3e8aaced6da5bc = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_710f28479ee4375cd7937ac951d3eed3 = $(`<div id="html_710f28479ee4375cd7937ac951d3eed3" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">28, Edward Street, Camden, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>904 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">827468620</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">67,785 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$17,240</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>5.6 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.051660, 150.698188           </div>         </div></div>`)[0];
+                popup_0971502063a0c5822e3e8aaced6da5bc.setContent(html_710f28479ee4375cd7937ac951d3eed3);
+            
+        
+
+        circle_marker_68ed562e9f5a87d99bcce82661674617.bindPopup(popup_0971502063a0c5822e3e8aaced6da5bc)
+        ;
+
+        
+    
+    
+            circle_marker_68ed562e9f5a87d99bcce82661674617.bindTooltip(
+                `<div>
+                     nan — 904 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_327ffe3c2edc61384b870b84dbe02365 = L.circleMarker(
+                [-34.0606042125, 150.6929134125],
+                {"bubblingMouseEvents": true, "color": "#2a7ae2", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2a7ae2", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 19.098811159540197, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_5120f5214f9753c9775cd3f00904714b = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_e6e26af7a52722f56c7887331913593a = $(`<div id="html_e6e26af7a52722f56c7887331913593a" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Little Street, Camden, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>888 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">1299908548</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">66,592 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$16,964</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>5.6 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.060604, 150.692913           </div>         </div></div>`)[0];
+                popup_5120f5214f9753c9775cd3f00904714b.setContent(html_e6e26af7a52722f56c7887331913593a);
+            
+        
+
+        circle_marker_327ffe3c2edc61384b870b84dbe02365.bindPopup(popup_5120f5214f9753c9775cd3f00904714b)
+        ;
+
+        
+    
+    
+            circle_marker_327ffe3c2edc61384b870b84dbe02365.bindTooltip(
+                `<div>
+                     nan — 888 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_30d8e996eb5d39de181ed386dd64af3a = L.circleMarker(
+                [-34.19846564285714, 150.64462048285714],
+                {"bubblingMouseEvents": true, "color": "#2a7ae2", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2a7ae2", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 18.0368442595253, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_7c43c2b5559749a221527265d1d306bd = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_1b0fdfac082f38824d5204223a443593 = $(`<div id="html_1b0fdfac082f38824d5204223a443593" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Picton Road, Maldon, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>782 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">48628942</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">58,642 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$15,123</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>5.5 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.198466, 150.644620           </div>         </div></div>`)[0];
+                popup_7c43c2b5559749a221527265d1d306bd.setContent(html_1b0fdfac082f38824d5204223a443593);
+            
+        
+
+        circle_marker_30d8e996eb5d39de181ed386dd64af3a.bindPopup(popup_7c43c2b5559749a221527265d1d306bd)
+        ;
+
+        
+    
+    
+            circle_marker_30d8e996eb5d39de181ed386dd64af3a.bindTooltip(
+                `<div>
+                     nan — 782 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a7c08e73b3f275b2d6d35a3bfe65a530 = L.circleMarker(
+                [-34.198803492857145, 150.64484620714285],
+                {"bubblingMouseEvents": true, "color": "#2a7ae2", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2a7ae2", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15.763413900809754, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_3d8a4db85c01213744558d3eaa0b25f0 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_3534971bf565119ef634bdb2a897d465 = $(`<div id="html_3534971bf565119ef634bdb2a897d465" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Picton Road, Maldon, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>580 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">48628951</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">43,470 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$11,610</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>5.3 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.198803, 150.644846           </div>         </div></div>`)[0];
+                popup_3d8a4db85c01213744558d3eaa0b25f0.setContent(html_3534971bf565119ef634bdb2a897d465);
+            
+        
+
+        circle_marker_a7c08e73b3f275b2d6d35a3bfe65a530.bindPopup(popup_3d8a4db85c01213744558d3eaa0b25f0)
+        ;
+
+        
+    
+    
+            circle_marker_a7c08e73b3f275b2d6d35a3bfe65a530.bindTooltip(
+                `<div>
+                     nan — 580 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_812248447f5a5caf6d9a5796c6d84822 = L.circleMarker(
+                [-34.05242748571429, 150.69932787142858],
+                {"bubblingMouseEvents": true, "color": "#2a7ae2", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2a7ae2", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15.442444352700527, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_f6bcaeac0e73a329d2b2d5358b299812 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_645e5bff81882634e954d54152fa923e = $(`<div id="html_645e5bff81882634e954d54152fa923e" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Edward Street, Camden, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>554 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">827468626</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">41,528 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$11,161</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>5.3 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.052427, 150.699328           </div>         </div></div>`)[0];
+                popup_f6bcaeac0e73a329d2b2d5358b299812.setContent(html_645e5bff81882634e954d54152fa923e);
+            
+        
+
+        circle_marker_812248447f5a5caf6d9a5796c6d84822.bindPopup(popup_f6bcaeac0e73a329d2b2d5358b299812)
+        ;
+
+        
+    
+    
+            circle_marker_812248447f5a5caf6d9a5796c6d84822.bindTooltip(
+                `<div>
+                     nan — 554 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_5b57ea51a06afbf97d1ac66a14f635a7 = L.circleMarker(
+                [-34.06092065, 150.69279823333332],
+                {"bubblingMouseEvents": true, "color": "#2a7ae2", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2a7ae2", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 14.857923117645631, "stroke": true, "weight": 1.5}
+            ).addTo(marker_cluster_593c1fcc780f1253d0666251f22390f9);
+        
+    
+        var popup_30f1e996cf38b737325238be0a738392 = L.popup({
+  "maxWidth": 280,
+});
+
+        
+            
+                var html_e18a81172a407821180b569d8f647a83 = $(`<div id="html_e18a81172a407821180b569d8f647a83" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;min-width:240px;font-size:13px">           <b style="font-size:14px">nan</b><br>           <span style="color:#555">Little Street, Camden, New South Wales</span>           <hr style="margin:6px 0">           <table style="width:100%;border-collapse:collapse">             <tr><td>Roof area</td><td align="right"><b>508 m²</b></td></tr>             <tr><td>OSM ID</td><td align="right">1299908552</td></tr>             <tr style="color:#c00"><td>Solar panels</td><td align="right"><b>None detected</b></td></tr>             <tr><td colspan=2 style="padding-top:6px;color:#888;font-size:11px">── Energy estimate ──</td></tr>             <tr><td>Annual consumption</td><td align="right">38,115 kWh</td></tr>             <tr><td>Est. annual bill</td><td align="right"><b>$10,371</b></td></tr>             <tr style="color:#2a7">               <td>Solar payback</td><td align="right"><b>5.2 yr</b></td>             </tr>           </table>           <div style="margin-top:8px;font-size:11px;color:#888">             -34.060921, 150.692798           </div>         </div></div>`)[0];
+                popup_30f1e996cf38b737325238be0a738392.setContent(html_e18a81172a407821180b569d8f647a83);
+            
+        
+
+        circle_marker_5b57ea51a06afbf97d1ac66a14f635a7.bindPopup(popup_30f1e996cf38b737325238be0a738392)
+        ;
+
+        
+    
+    
+            circle_marker_5b57ea51a06afbf97d1ac66a14f635a7.bindTooltip(
+                `<div>
+                     nan — 508 m²
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            marker_cluster_593c1fcc780f1253d0666251f22390f9.addTo(map_7c005e98ca72ef2d3ada35fafdab670d);
+        
+    
+            var layer_control_21b30f45d3fb8790b8e65da854fbbfac_layers = {
+                base_layers : {
+                    "cartodbpositron" : tile_layer_be687937a2029a1f79b906535923bdfa,
+                },
+                overlays :  {
+                    "Warehouses" : marker_cluster_593c1fcc780f1253d0666251f22390f9,
+                },
+            };
+            let layer_control_21b30f45d3fb8790b8e65da854fbbfac = L.control.layers(
+                layer_control_21b30f45d3fb8790b8e65da854fbbfac_layers.base_layers,
+                layer_control_21b30f45d3fb8790b8e65da854fbbfac_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": true,
+  "autoZIndex": true,
+}
+            ).addTo(map_7c005e98ca72ef2d3ada35fafdab670d);
+
+        
+</script>
+</html>

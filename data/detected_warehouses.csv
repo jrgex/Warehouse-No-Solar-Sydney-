@@ -1,21 +1,21 @@
 osm_id,name,address,suburb,lat,lng,estimated_area_sqm,has_solar,solar_coverage_pct,image_path
-314655990,Coles CDC,,,-34.04069232340426,150.763855293617,66474.5,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655990.png
-314655992,,,,-34.038326260000005,150.75845606,13338.9,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655992.png
-314655988,,,,-34.0391901,150.75458917999998,11514.1,False,0.01,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655988.png
-314655985,,,,-34.04143269642857,150.75572836785713,9227.8,False,0.06,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655985.png
-314655984,,,,-34.03930986666666,150.7593928,7377.4,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655984.png
-314655987,,,,-34.03857134,150.75995016,6101.6,False,1.21,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655987.png
-314655991,,,,-34.03904704,150.75791704,5899.7,False,0.11,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655991.png
-314655989,,,,-34.03785362,150.75695884,4879.3,False,0.05,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655989.png
-314655986,,,,-34.040523489473685,150.7563022263158,3445.9,False,3.55,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655986.png
-48628097,,,,-34.19627342093023,150.6354160255814,3226.7,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/48628097.png
-1299908543,,,,-34.0608831,150.69193528888889,2177.2,False,0.46,/home/jr/Warehouse-No-Solar-Sydney/data/images/1299908543.png
-827468619,,,,-34.05207492,150.69937646,1651.4,False,0.31,/home/jr/Warehouse-No-Solar-Sydney/data/images/827468619.png
-1494099155,,,,-34.18009852857143,150.5674917714286,1543.0,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/1494099155.png
-827468622,,,,-34.05182422857143,150.6978126,942.9,False,0.6,/home/jr/Warehouse-No-Solar-Sydney/data/images/827468622.png
-827468620,,,,-34.051660479999995,150.69818837999998,903.8,False,0.58,/home/jr/Warehouse-No-Solar-Sydney/data/images/827468620.png
-1299908548,,,,-34.060604212499996,150.6929134125,887.9,False,0.49,/home/jr/Warehouse-No-Solar-Sydney/data/images/1299908548.png
-48628942,,,,-34.19846564285714,150.64462048285714,781.9,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/48628942.png
-48628951,,,,-34.198803492857145,150.64484620714285,579.6,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/48628951.png
-827468626,,,,-34.05242748571429,150.69932787142858,553.7,False,0.28,/home/jr/Warehouse-No-Solar-Sydney/data/images/827468626.png
-1299908552,,,,-34.06092065,150.69279823333332,508.2,False,0.36,/home/jr/Warehouse-No-Solar-Sydney/data/images/1299908552.png
+314655990,Coles CDC,"Hartley Road, Smeaton Grange, New South Wales",,-34.04069232340426,150.763855293617,66474.5,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655990.png
+314655992,,"Anzac Avenue, Smeaton Grange, New South Wales",,-34.038326260000005,150.75845606,13338.9,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655992.png
+314655988,,"Hartley Road, Smeaton Grange, New South Wales",,-34.0391901,150.75458917999998,11514.1,False,0.01,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655988.png
+314655985,,"101, Smeaton Grange Road, Smeaton Grange, New South Wales",,-34.04143269642857,150.75572836785713,9227.8,False,0.06,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655985.png
+314655984,,"Hartley Road, Smeaton Grange, New South Wales",,-34.03930986666666,150.7593928,7377.4,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655984.png
+314655987,,"10, Bluett Drive, Smeaton Grange, New South Wales",,-34.03857134,150.75995016,6101.6,False,1.21,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655987.png
+314655991,,"Hartley Road, Smeaton Grange, New South Wales",,-34.03904704,150.75791704,5899.7,False,0.11,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655991.png
+314655989,,"Anzac Avenue, Smeaton Grange, New South Wales",,-34.03785362,150.75695884,4879.3,False,0.05,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655989.png
+314655986,,"Anzac Avenue, Smeaton Grange, New South Wales",,-34.040523489473685,150.7563022263158,3445.9,False,3.55,/home/jr/Warehouse-No-Solar-Sydney/data/images/314655986.png
+48628097,,"Maldon Bridge Road, Picton, New South Wales",,-34.19627342093023,150.6354160255814,3226.7,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/48628097.png
+1299908543,,"Little Street, Camden, New South Wales",,-34.0608831,150.69193528888889,2177.2,False,0.46,/home/jr/Warehouse-No-Solar-Sydney/data/images/1299908543.png
+827468619,,"Edward Street, Camden, New South Wales",,-34.05207492,150.69937646,1651.4,False,0.31,/home/jr/Warehouse-No-Solar-Sydney/data/images/827468619.png
+1494099155,,"269, Mulhollands Road, New South Wales",,-34.18009852857143,150.5674917714286,1543.0,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/1494099155.png
+827468622,,"Mitchell Street, Camden, New South Wales",,-34.05182422857143,150.6978126,942.9,False,0.6,/home/jr/Warehouse-No-Solar-Sydney/data/images/827468622.png
+827468620,,"28, Edward Street, Camden, New South Wales",,-34.051660479999995,150.69818837999998,903.8,False,0.58,/home/jr/Warehouse-No-Solar-Sydney/data/images/827468620.png
+1299908548,,"Little Street, Camden, New South Wales",,-34.0606042125,150.6929134125,887.9,False,0.49,/home/jr/Warehouse-No-Solar-Sydney/data/images/1299908548.png
+48628942,,"Picton Road, Maldon, New South Wales",,-34.19846564285714,150.64462048285714,781.9,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/48628942.png
+48628951,,"Picton Road, Maldon, New South Wales",,-34.198803492857145,150.64484620714285,579.6,False,0.0,/home/jr/Warehouse-No-Solar-Sydney/data/images/48628951.png
+827468626,,"Edward Street, Camden, New South Wales",,-34.05242748571429,150.69932787142858,553.7,False,0.28,/home/jr/Warehouse-No-Solar-Sydney/data/images/827468626.png
+1299908552,,"Little Street, Camden, New South Wales",,-34.06092065,150.69279823333332,508.2,False,0.36,/home/jr/Warehouse-No-Solar-Sydney/data/images/1299908552.png

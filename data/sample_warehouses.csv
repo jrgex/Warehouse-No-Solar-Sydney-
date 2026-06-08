@@ -1,0 +1,16 @@
+warehouse_id,name,address,suburb,postcode,lat,lng,estimated_area_sqm,has_solar,solar_coverage_pct,roof_type,warehouse_type,last_assessed,notes
+W001,Sydney Distribution Hub,45 Interchange Drive,Wetherill Park,2164,-33.8456,150.9012,8500,False,0.0,Colorbond Metal,ambient_logistics,2024-03-15,Large 3PL facility no solar detected
+W002,Smithfield Logistics Centre,120 Derby Street,Smithfield,2164,-33.8523,150.9178,4200,False,0.0,Concrete Panel,ambient_logistics,2024-03-15,Adjacent to M7 motorway
+W003,Prestons Cold Store,88 Ashford Road,Prestons,2170,-33.9456,150.8734,2800,False,0.0,Insulated Panel,cold_storage,2024-04-01,Refrigerated distribution -18C
+W004,Ingleburn Industrial,22 Wentworth Avenue,Ingleburn,2565,-33.9978,150.8612,3100,False,0.0,Colorbond Metal,light_industrial,2024-04-01,Mixed use light industrial
+W005,Eastern Creek Warehouse,15 Holbeche Road,Eastern Creek,2766,-33.8012,150.8567,6700,False,0.0,Colorbond Metal,ambient_logistics,2024-03-20,Near M7/M4 interchange
+W006,Minto Logistics Park,55 Minto Road,Minto,2566,-34.0234,150.8456,5200,False,0.0,TPO Membrane,ambient_logistics,2024-04-10,Part of larger industrial estate
+W007,Rydalmere Storage,34 Parramatta Road,Rydalmere,2116,-33.8189,151.0345,1800,False,0.0,Colorbond Metal,general_warehouse,2024-02-28,Smaller warehouse near Parramatta
+W008,Moorebank Intermodal South,200 Moorebank Avenue,Moorebank,2170,-33.9345,150.9234,12000,False,0.0,TPO Membrane,ambient_logistics,2024-04-15,Part of SIMTA intermodal terminal
+W009,Kemps Creek Facility,10 Lockwood Road,Kemps Creek,2178,-33.8678,150.8123,9800,False,0.0,Colorbond Metal,refrigerated_distribution,2024-03-28,Chilled and frozen distribution
+W010,Auburn Warehousing,72 Wellington Road,Auburn,2144,-33.8567,151.0234,2100,False,0.0,Concrete Panel,general_warehouse,2024-02-15,Smaller suburban warehouse
+W011,Villawood Distribution,95 Miller Road,Villawood,2163,-33.8712,150.9678,3400,False,0.0,Colorbond Metal,ambient_logistics,2024-03-10,Mid-size 3PL
+W012,Chullora Freight Hub,88 Roberts Road,Chullora,2190,-33.8923,151.0456,5600,False,0.0,Colorbond Metal,ambient_logistics,2024-03-22,Close to Sydney Markets
+W013,Seven Hills Industrial,45 Old Windsor Road,Seven Hills,2147,-33.7712,150.9345,2900,False,0.0,Colorbond Metal,light_industrial,2024-02-20,Light manufacturing + storage
+W014,Blacktown Cold Chain,120 Richmond Road,Blacktown,2148,-33.7756,150.9067,4100,False,0.0,Insulated Panel,cold_storage,2024-04-05,Temperature controlled −25C to +8C
+W015,Marsden Park Logistics,35 Commercial Road,Marsden Park,2765,-33.7234,150.8234,7800,False,0.0,TPO Membrane,ambient_logistics,2024-04-20,New development 2023

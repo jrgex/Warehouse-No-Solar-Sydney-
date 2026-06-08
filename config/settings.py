@@ -1,6 +1,8 @@
 """
 Central configuration for the Warehouse No Solar Sydney project.
-Copy .env.example to .env and populate with your API keys.
+
+No API keys are required for detection — Overpass (OSM) and NSW SIX Maps
+are both free public services.
 """
 import os
 from pathlib import Path
@@ -10,8 +12,25 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Google Maps
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "")
+# ---------------------------------------------------------------------------
+# Free data sources — no key required
+# ---------------------------------------------------------------------------
+
+# OpenStreetMap Overpass API — warehouse/industrial building discovery
+OVERPASS_API_URL = "https://overpass-api.de/api/interpreter"
+
+# NSW Government SIX Maps WMS — free high-resolution aerial imagery for NSW
+# Docs: https://maps.six.nsw.gov.au
+NSW_WMS_URL = (
+    "https://maps.six.nsw.gov.au/arcgis/services/sixmaps/"
+    "LPI_Imagery_Best/MapServer/WmsServer"
+)
+
+# Image resolution: target ~0.30 m/px (equivalent to Google Maps zoom 19)
+# At Sydney lat −33.9°: 1° lon ≈ 92,600 m, 1° lat ≈ 111,000 m
+WMS_IMAGE_WIDTH_PX = 640
+WMS_IMAGE_HEIGHT_PX = 640
+WMS_COVERAGE_METRES = 192  # square tile side length in metres
 
 # AEMO NEM data endpoints
 AEMO_BASE_URL = "https://visualisations.aemo.com.au/aemo/apps/api/report"

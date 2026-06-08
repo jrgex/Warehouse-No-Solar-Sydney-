@@ -79,32 +79,67 @@ def run_sample_pipeline(warehouse_csv: Path, nem_csv: Path) -> None:
     print(f"    Min  demand: {nem_df['total_demand_mw'].min():.1f} MW\n")
 
 
-def run_live_detection() -> None:
-    from config.settings import GOOGLE_MAPS_API_KEY
+def run_live_detection(max_results: int = 50) -> None:
+    """
+    Live detection using Overpass API (OpenStreetMap) + NSW SIX Maps WMS.
+    No API key required.
+    """
     from src.data_ingestion.warehouse_detector import WarehouseDetector
 
-    if not GOOGLE_MAPS_API_KEY:
-        print("ERROR: Set GOOGLE_MAPS_API_KEY in your .env file to run live detection.")
-        sys.exit(1)
+    image_dir = DATA_DIR / "images"
+    print(f"\nStarting live detection — Overpass API + NSW SIX Maps WMS")
+    print(f"Images will be cached to: {image_dir}\n")
 
-    print("\nStarting live warehouse detection across Greater Sydney…")
-    detector = WarehouseDetector()
-    results = detector.scan_sydney(max_results=50)
-    print(f"\nFound {len(results)} no-solar warehouses (>500 m²)")
-    if not results.empty:
-        print(results[["name", "address", "estimated_area_sqm", "solar_coverage_pct"]].to_string(index=False))
-        out = DATA_DIR / "detected_warehouses.csv"
-        results.to_csv(out, index=False)
-        print(f"\nResults saved to {out}")
+    detector = WarehouseDetector(image_cache_dir=image_dir)
+    results = detector.scan_sydney(max_results=max_results)
+
+    print(f"\n{'='*60}")
+    print(f"  Found {len(results)} no-solar warehouses (>{500} m²) in Greater Sydney")
+    print(f"{'='*60}\n")
+
+    if results.empty:
+        print("No results — check your internet connection or try again later.")
+        return
+
+    display_cols = ["name", "suburb", "estimated_area_sqm", "solar_coverage_pct", "lat", "lng"]
+    display_cols = [c for c in display_cols if c in results.columns]
+    print(results[display_cols].to_string(index=False))
+
+    out = DATA_DIR / "detected_warehouses.csv"
+    results.to_csv(out, index=False)
+    print(f"\nResults saved to {out}")
+
+    # Run cost analysis on the live results
+    print("\n--- Cost estimates for detected warehouses ---\n")
+    print(f"  {'Name/ID':<30} {'Area':>6} {'Ann. Cost':>12} {'Solar Save':>12} {'Payback':>9}")
+    print("  " + "-" * 75)
+    for _, wh in results.iterrows():
+        ba = BaselineDemandAnalyser(warehouse_area_sqm=wh["estimated_area_sqm"])
+        profile = ba.benchmark_interval_kw()
+        pa = PeakOffPeakAnalyser(profile)
+        from src.cost_estimation.tariff_calculator import TariffCalculator
+        calc = TariffCalculator(pa, roof_area_sqm=wh["estimated_area_sqm"])
+        r = calc.annual_cost_report()
+        label = (wh.get("name") or wh.get("osm_id", ""))[:30]
+        pb = f"{r.solar_simple_payback_years:.1f} yr" if r.solar_simple_payback_years else "N/A"
+        sv = f"${r.solar_annual_saving:>10,.0f}" if r.solar_annual_saving else "       N/A"
+        print(f"  {label:<30} {wh['estimated_area_sqm']:>6,.0f} ${r.total_annual_cost:>11,.0f} {sv} {pb:>9}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Warehouse No-Solar Sydney analysis")
-    parser.add_argument("--detect", action="store_true", help="Run live Google Maps detection")
+    parser.add_argument(
+        "--detect", action="store_true",
+        help="Run live detection via Overpass API + NSW SIX Maps WMS (no key needed)"
+    )
+    parser.add_argument(
+        "--max", type=int, default=50, metavar="N",
+        help="Maximum OSM buildings to assess during live detection (default: 50)"
+    )
     args = parser.parse_args()
 
     if args.detect:
-        run_live_detection()
+        run_live_detection(max_results=args.max)
     else:
         run_sample_pipeline(
             warehouse_csv=DATA_DIR / "sample_warehouses.csv",

@@ -1,15 +1,23 @@
 """
-Warehouse detection and solar panel assessment using Google Maps imagery.
+Warehouse detection and solar panel assessment — no API key required.
 
 Pipeline:
-  1. Query Google Maps Places API for industrial properties in Greater Sydney.
-  2. Fetch satellite / aerial tiles via the Static Maps API.
-  3. Apply computer-vision heuristics to classify each rooftop as:
-       - has_solar  (True/False)
-       - roof_area_sqm (estimated from pixel count + map scale)
-  4. Filter to warehouses > MIN_WAREHOUSE_AREA_SQM with no solar.
+  1. Query Overpass API (OpenStreetMap) for warehouse/industrial buildings
+     in Greater Sydney with footprint area ≥ MIN_WAREHOUSE_AREA_SQM.
+  2. Fetch a 640×640 aerial tile from the NSW SIX Maps WMS (free public service)
+     for each building centroid.
+  3. Apply OpenCV heuristics to classify the rooftop:
+       has_solar          — True/False
+       solar_coverage_pct — % of roof pixels classified as PV panels
+  4. Return a DataFrame of no-solar warehouses.
+
+Free services used:
+  • Overpass API  — https://overpass-api.de (OpenStreetMap)
+  • NSW SIX Maps  — https://maps.six.nsw.gov.au (NSW Government)
 """
+import io
 import logging
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator, Optional
@@ -18,55 +26,67 @@ import cv2
 import numpy as np
 import pandas as pd
 import requests
+from shapely.geometry import Polygon
 
 from config.settings import (
-    GOOGLE_MAPS_API_KEY,
     MIN_WAREHOUSE_AREA_SQM,
+    NSW_WMS_URL,
+    OVERPASS_API_URL,
     SOLAR_PIXEL_THRESHOLD,
     SYDNEY_BOUNDS,
-    WAREHOUSE_ASPECT_RATIO_MIN,
+    WMS_COVERAGE_METRES,
+    WMS_IMAGE_HEIGHT_PX,
+    WMS_IMAGE_WIDTH_PX,
 )
 
 logger = logging.getLogger(__name__)
 
-STATIC_MAPS_URL = "https://maps.googleapis.com/maps/api/staticmap"
-PLACES_NEARBY_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-GEOCODE_URL = "https://maps.googleapis.com/maps/api/geocode/json"
+# Degrees of coverage for each WMS tile at Sydney latitude
+_LAT_DEG_PER_TILE = WMS_COVERAGE_METRES / 111_000
+_LNG_DEG_PER_TILE = WMS_COVERAGE_METRES / 92_600
 
-# Zoom level 20 → ~0.15 m/px in Sydney latitude; zoom 19 → ~0.30 m/px
-ZOOM_LEVEL = 19
-TILE_SIZE = 640  # pixels (max for free tier)
-METRES_PER_PIXEL_Z19 = 0.298  # at latitude −33.9°
+# Overpass query — finds ways tagged as warehouse/industrial with a building tag
+_OVERPASS_QUERY = """
+[out:json][timeout:60];
+(
+  way["building"~"^(warehouse|industrial|storage|distribution)$"]
+    ({south},{west},{north},{east});
+  way["building"]["industrial"~"^(warehouse|distribution)$"]
+    ({south},{west},{north},{east});
+  way["building"]["landuse"="industrial"]
+    ({south},{west},{north},{east});
+);
+out body;
+>;
+out skel qt;
+"""
+
+# Polite delay between WMS requests (seconds) to avoid rate-limit
+_WMS_REQUEST_DELAY = 0.3
 
 
 @dataclass
 class WarehouseRecord:
-    place_id: str
+    osm_id: str
     name: str
     address: str
+    suburb: str
     lat: float
     lng: float
     estimated_area_sqm: float
     has_solar: bool
     solar_coverage_pct: float
+    osm_tags: dict = field(default_factory=dict)
     image_path: Optional[str] = None
-    tags: list[str] = field(default_factory=list)
 
 
 class WarehouseDetector:
-    """Identify no-solar warehouses >500 m² in Greater Sydney."""
+    """
+    Identify no-solar warehouses >500 m² in Greater Sydney.
+    Uses Overpass API + NSW SIX Maps WMS — no API key required.
+    """
 
-    def __init__(
-        self,
-        api_key: str = GOOGLE_MAPS_API_KEY,
-        image_cache_dir: Optional[Path] = None,
-    ) -> None:
-        if not api_key:
-            raise ValueError(
-                "GOOGLE_MAPS_API_KEY is not set. "
-                "Add it to your .env file before running detection."
-            )
-        self.api_key = api_key
+    def __init__(self, image_cache_dir: Optional[Path] = None) -> None:
         self.image_cache_dir = image_cache_dir
         if image_cache_dir:
             image_cache_dir.mkdir(parents=True, exist_ok=True)
@@ -76,143 +96,196 @@ class WarehouseDetector:
     # ------------------------------------------------------------------
 
     def scan_sydney(self, max_results: int = 200) -> pd.DataFrame:
-        """Scan Greater Sydney for no-solar warehouses and return a DataFrame."""
-        records = []
-        for place in self._search_industrial_places(max_results=max_results):
-            record = self._assess_property(place)
-            if record and not record.has_solar and record.estimated_area_sqm >= MIN_WAREHOUSE_AREA_SQM:
-                records.append(record)
-                logger.info("Found: %s (%.0f m², no solar)", record.name, record.estimated_area_sqm)
+        """
+        Scan Greater Sydney for no-solar warehouses.
+        Returns a DataFrame sorted by estimated_area_sqm descending.
+        """
+        logger.info("Querying Overpass API for Sydney warehouses…")
+        candidates = list(self._overpass_warehouses())
+        logger.info("OSM returned %d candidate buildings", len(candidates))
 
-        return self._to_dataframe(records)
+        records: list[WarehouseRecord] = []
+        for i, bldg in enumerate(candidates[:max_results]):
+            rec = self._assess_building(bldg)
+            if rec is None:
+                continue
+            if not rec.has_solar and rec.estimated_area_sqm >= MIN_WAREHOUSE_AREA_SQM:
+                records.append(rec)
+                logger.info(
+                    "[%d/%d] ✓ No solar: %s (%.0f m²)",
+                    i + 1, len(candidates), rec.name or rec.osm_id, rec.estimated_area_sqm,
+                )
+            else:
+                logger.debug(
+                    "[%d/%d] Skip: %s — solar=%s area=%.0f m²",
+                    i + 1, len(candidates), rec.osm_id, rec.has_solar, rec.estimated_area_sqm,
+                )
+            time.sleep(_WMS_REQUEST_DELAY)
 
-    def assess_address(self, address: str) -> Optional[WarehouseRecord]:
-        """Assess a single known warehouse address."""
-        coords = self._geocode(address)
-        if coords is None:
-            logger.error("Could not geocode: %s", address)
-            return None
-        fake_place = {
-            "place_id": address,
-            "name": address,
-            "vicinity": address,
-            "geometry": {"location": {"lat": coords[0], "lng": coords[1]}},
+        df = self._to_dataframe(records)
+        return df.sort_values("estimated_area_sqm", ascending=False).reset_index(drop=True)
+
+    def assess_latlon(self, lat: float, lng: float, label: str = "") -> Optional[WarehouseRecord]:
+        """Assess a single location by coordinates."""
+        fake = {
+            "osm_id": f"{lat:.5f}_{lng:.5f}",
+            "centroid": (lat, lng),
+            "area_sqm": 0.0,
+            "tags": {"name": label},
         }
-        return self._assess_property(fake_place)
+        return self._assess_building(fake)
 
     # ------------------------------------------------------------------
-    # Places search
+    # Overpass / OSM
     # ------------------------------------------------------------------
 
-    def _search_industrial_places(self, max_results: int) -> Iterator[dict]:
-        """Yield place dicts from Places Nearby Search across Sydney grid."""
-        # Divide Sydney bounding box into a coarse grid to stay within radius limits
-        lat_steps = np.linspace(
-            SYDNEY_BOUNDS["south"], SYDNEY_BOUNDS["north"], num=5
-        )
-        lng_steps = np.linspace(
-            SYDNEY_BOUNDS["west"], SYDNEY_BOUNDS["east"], num=5
-        )
-        seen: set[str] = set()
-        count = 0
-
-        for lat in lat_steps:
-            for lng in lng_steps:
-                if count >= max_results:
-                    return
-                for place in self._places_page(lat, lng):
-                    pid = place.get("place_id", "")
-                    if pid in seen:
-                        continue
-                    seen.add(pid)
-                    yield place
-                    count += 1
-                    if count >= max_results:
-                        return
-
-    def _places_page(self, lat: float, lng: float) -> list[dict]:
-        params = {
-            "location": f"{lat},{lng}",
-            "radius": 8000,
-            "type": "storage",
-            "keyword": "warehouse logistics industrial",
-            "key": self.api_key,
-        }
-        results = []
-        while True:
-            resp = requests.get(PLACES_NEARBY_URL, params=params, timeout=15)
+    def _overpass_warehouses(self) -> Iterator[dict]:
+        """Yield building dicts from Overpass with centroid and area."""
+        query = _OVERPASS_QUERY.format(**SYDNEY_BOUNDS)
+        try:
+            resp = requests.post(
+                OVERPASS_API_URL,
+                data={"data": query},
+                timeout=90,
+                headers={"User-Agent": "WarehouseNoSolarSydney/1.0"},
+            )
             resp.raise_for_status()
-            data = resp.json()
-            results.extend(data.get("results", []))
-            page_token = data.get("next_page_token")
-            if not page_token:
-                break
-            params = {"pagetoken": page_token, "key": self.api_key}
-        return results
+        except requests.RequestException as exc:
+            logger.error("Overpass request failed: %s", exc)
+            return
+
+        data = resp.json()
+        node_coords: dict[int, tuple[float, float]] = {
+            n["id"]: (n["lat"], n["lon"])
+            for n in data.get("elements", [])
+            if n["type"] == "node"
+        }
+
+        for elem in data.get("elements", []):
+            if elem["type"] != "way":
+                continue
+            nodes = elem.get("nodes", [])
+            coords = [node_coords[n] for n in nodes if n in node_coords]
+            if len(coords) < 3:
+                continue
+
+            area_sqm = self._polygon_area_sqm(coords)
+            if area_sqm < MIN_WAREHOUSE_AREA_SQM:
+                continue
+
+            lats = [c[0] for c in coords]
+            lngs = [c[1] for c in coords]
+            centroid = (sum(lats) / len(lats), sum(lngs) / len(lngs))
+
+            yield {
+                "osm_id": str(elem["id"]),
+                "centroid": centroid,
+                "area_sqm": area_sqm,
+                "tags": elem.get("tags", {}),
+            }
+
+    @staticmethod
+    def _polygon_area_sqm(coords: list[tuple[float, float]]) -> float:
+        """Approximate polygon area in m² using a local flat-earth projection."""
+        lat0 = coords[0][0]
+        metres_per_lat = 111_000.0
+        metres_per_lng = 111_000.0 * np.cos(np.radians(lat0))
+        xy = [(c[1] * metres_per_lng, c[0] * metres_per_lat) for c in coords]
+        try:
+            return Polygon(xy).area
+        except Exception:
+            return 0.0
 
     # ------------------------------------------------------------------
-    # Property assessment
+    # Building assessment
     # ------------------------------------------------------------------
 
-    def _assess_property(self, place: dict) -> Optional[WarehouseRecord]:
-        loc = place["geometry"]["location"]
-        lat, lng = loc["lat"], loc["lng"]
+    def _assess_building(self, bldg: dict) -> Optional[WarehouseRecord]:
+        lat, lng = bldg["centroid"]
+        tags = bldg.get("tags", {})
 
-        image = self._fetch_satellite_image(lat, lng)
+        image = self._fetch_wms_image(lat, lng)
         if image is None:
             return None
 
         roof_mask = self._extract_roof_mask(image)
-        area_sqm = self._estimate_roof_area(roof_mask)
+        area_sqm = bldg["area_sqm"] if bldg["area_sqm"] > 0 else self._estimate_roof_area(roof_mask)
         has_solar, coverage_pct = self._detect_solar_panels(image, roof_mask)
 
         img_path: Optional[str] = None
-        if self.image_cache_dir:
-            pid = place.get("place_id", f"{lat}_{lng}").replace("/", "_")
-            img_path = str(self.image_cache_dir / f"{pid}.png")
+        if self.image_cache_dir is not None:
+            fname = f"{bldg['osm_id']}.png"
+            img_path = str(self.image_cache_dir / fname)
             cv2.imwrite(img_path, image)
 
+        name = tags.get("name") or tags.get("operator") or ""
+        address = " ".join(filter(None, [
+            tags.get("addr:housenumber", ""),
+            tags.get("addr:street", ""),
+        ]))
+        suburb = tags.get("addr:suburb") or tags.get("addr:city") or ""
+
         return WarehouseRecord(
-            place_id=place.get("place_id", ""),
-            name=place.get("name", "Unknown"),
-            address=place.get("vicinity", ""),
+            osm_id=bldg["osm_id"],
+            name=name,
+            address=address,
+            suburb=suburb,
             lat=lat,
             lng=lng,
-            estimated_area_sqm=area_sqm,
+            estimated_area_sqm=round(area_sqm, 1),
             has_solar=has_solar,
             solar_coverage_pct=coverage_pct,
+            osm_tags=tags,
             image_path=img_path,
         )
 
     # ------------------------------------------------------------------
-    # Satellite image fetching
+    # NSW SIX Maps WMS image fetching
     # ------------------------------------------------------------------
 
-    def _fetch_satellite_image(self, lat: float, lng: float) -> Optional[np.ndarray]:
-        cache_key = f"{lat:.6f}_{lng:.6f}_z{ZOOM_LEVEL}"
+    def _fetch_wms_image(self, lat: float, lng: float) -> Optional[np.ndarray]:
+        cache_key = f"{lat:.6f}_{lng:.6f}"
         if self.image_cache_dir:
             cached = self.image_cache_dir / f"{cache_key}.png"
             if cached.exists():
                 return cv2.imread(str(cached))
 
+        # Build WMS BBOX centred on the building
+        half_lat = _LAT_DEG_PER_TILE / 2
+        half_lng = _LNG_DEG_PER_TILE / 2
+        bbox = f"{lng - half_lng},{lat - half_lat},{lng + half_lng},{lat + half_lat}"
+
         params = {
-            "center": f"{lat},{lng}",
-            "zoom": ZOOM_LEVEL,
-            "size": f"{TILE_SIZE}x{TILE_SIZE}",
-            "maptype": "satellite",
-            "key": self.api_key,
+            "SERVICE": "WMS",
+            "VERSION": "1.1.1",
+            "REQUEST": "GetMap",
+            "LAYERS": "0",
+            "STYLES": "",
+            "FORMAT": "image/jpeg",
+            "SRS": "EPSG:4326",
+            "BBOX": bbox,
+            "WIDTH": WMS_IMAGE_WIDTH_PX,
+            "HEIGHT": WMS_IMAGE_HEIGHT_PX,
         }
         try:
-            resp = requests.get(STATIC_MAPS_URL, params=params, timeout=15)
+            resp = requests.get(NSW_WMS_URL, params=params, timeout=20,
+                                headers={"User-Agent": "WarehouseNoSolarSydney/1.0"})
             resp.raise_for_status()
+            # WMS returns an error XML if something goes wrong even on HTTP 200
+            if b"<ServiceException" in resp.content[:200]:
+                logger.warning("WMS service exception for (%.6f, %.6f)", lat, lng)
+                return None
         except requests.RequestException as exc:
-            logger.warning("Image fetch failed for (%.6f, %.6f): %s", lat, lng, exc)
+            logger.warning("WMS fetch failed for (%.6f, %.6f): %s", lat, lng, exc)
             return None
 
         arr = np.frombuffer(resp.content, dtype=np.uint8)
         img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+        if img is None:
+            logger.warning("Could not decode image for (%.6f, %.6f)", lat, lng)
+            return None
 
-        if self.image_cache_dir and img is not None:
+        if self.image_cache_dir:
             cv2.imwrite(str(self.image_cache_dir / f"{cache_key}.png"), img)
 
         return img
@@ -222,79 +295,51 @@ class WarehouseDetector:
     # ------------------------------------------------------------------
 
     def _extract_roof_mask(self, image: np.ndarray) -> np.ndarray:
-        """Return a binary mask isolating large flat rooftop regions."""
+        """Binary mask of large flat rectangular roof regions."""
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-        # Threshold for light-coloured industrial roofs (metal, concrete, coated)
-        _, thresh = cv2.threshold(blurred, 160, 255, cv2.THRESH_BINARY)
+        _, thresh = cv2.threshold(blurred, 155, 255, cv2.THRESH_BINARY)
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 15))
         closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
-        # Keep only contours with sufficiently rectangular aspect ratio
+
         mask = np.zeros_like(closed)
         contours, _ = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contours:
-            area = cv2.contourArea(cnt)
-            if area < 500:
+            if cv2.contourArea(cnt) < 400:
                 continue
             rect = cv2.minAreaRect(cnt)
             w, h = rect[1]
             if min(w, h) == 0:
                 continue
-            ratio = max(w, h) / min(w, h)
-            if ratio >= WAREHOUSE_ASPECT_RATIO_MIN:
+            if max(w, h) / min(w, h) >= 1.2:
                 cv2.drawContours(mask, [cnt], -1, 255, -1)
         return mask
 
     def _estimate_roof_area(self, roof_mask: np.ndarray) -> float:
-        """Convert roof pixel count to square metres using map scale."""
-        pixel_count = cv2.countNonZero(roof_mask)
-        sqm = pixel_count * (METRES_PER_PIXEL_Z19 ** 2)
-        return round(sqm, 1)
+        metres_per_pixel = WMS_COVERAGE_METRES / WMS_IMAGE_WIDTH_PX
+        return round(cv2.countNonZero(roof_mask) * metres_per_pixel ** 2, 1)
 
     def _detect_solar_panels(
         self, image: np.ndarray, roof_mask: np.ndarray
     ) -> tuple[bool, float]:
         """
-        Classify whether solar panels are present on the roof.
-
-        Solar panels in satellite imagery appear as dark navy/blue-black rectangular
-        arrays with a slightly blue tint compared to surrounding roof material.
+        Detect solar panels from aerial imagery.
+        PV panels in NSW SIX Maps aerial images appear as dark navy/blue-grey
+        rectangular arrays on otherwise light-coloured industrial roofs.
         """
-        # Convert to HSV for colour segmentation
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        # Dark blue-black HSV range for PV panels
+        lower = np.array([90, 15, 10])
+        upper = np.array([150, 255, 85])
+        solar_mask = cv2.inRange(hsv, lower, upper)
 
-        # Dark blue-black range: hue 100–140, low saturation possible, low value
-        lower_solar = np.array([90, 20, 10])
-        upper_solar = np.array([145, 255, 80])
-        solar_mask = cv2.inRange(hsv, lower_solar, upper_solar)
-
-        # Intersect with roof area only
         roof_only = cv2.bitwise_and(solar_mask, roof_mask)
         roof_pixels = cv2.countNonZero(roof_mask)
         if roof_pixels == 0:
             return False, 0.0
 
-        solar_pixels = cv2.countNonZero(roof_only)
-        coverage = solar_pixels / roof_pixels
-        has_solar = coverage >= SOLAR_PIXEL_THRESHOLD
-        return has_solar, round(coverage * 100, 2)
-
-    # ------------------------------------------------------------------
-    # Geocoding
-    # ------------------------------------------------------------------
-
-    def _geocode(self, address: str) -> Optional[tuple[float, float]]:
-        params = {"address": address, "key": self.api_key}
-        try:
-            resp = requests.get(GEOCODE_URL, params=params, timeout=10)
-            resp.raise_for_status()
-            results = resp.json().get("results", [])
-            if results:
-                loc = results[0]["geometry"]["location"]
-                return loc["lat"], loc["lng"]
-        except requests.RequestException as exc:
-            logger.error("Geocode error: %s", exc)
-        return None
+        coverage = cv2.countNonZero(roof_only) / roof_pixels
+        return coverage >= SOLAR_PIXEL_THRESHOLD, round(coverage * 100, 2)
 
     # ------------------------------------------------------------------
     # Output
@@ -303,10 +348,12 @@ class WarehouseDetector:
     @staticmethod
     def _to_dataframe(records: list[WarehouseRecord]) -> pd.DataFrame:
         if not records:
-            return pd.DataFrame(
-                columns=[
-                    "place_id", "name", "address", "lat", "lng",
-                    "estimated_area_sqm", "has_solar", "solar_coverage_pct",
-                ]
-            )
-        return pd.DataFrame([vars(r) for r in records])
+            return pd.DataFrame(columns=[
+                "osm_id", "name", "address", "suburb", "lat", "lng",
+                "estimated_area_sqm", "has_solar", "solar_coverage_pct",
+            ])
+        rows = []
+        for r in records:
+            row = {k: v for k, v in vars(r).items() if k != "osm_tags"}
+            rows.append(row)
+        return pd.DataFrame(rows)

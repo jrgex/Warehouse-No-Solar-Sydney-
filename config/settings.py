@@ -19,18 +19,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # OpenStreetMap Overpass API — warehouse/industrial building discovery
 OVERPASS_API_URL = "https://overpass-api.de/api/interpreter"
 
-# NSW Government SIX Maps WMS — free high-resolution aerial imagery for NSW
-# Docs: https://maps.six.nsw.gov.au
-NSW_WMS_URL = (
-    "https://maps.six.nsw.gov.au/arcgis/services/sixmaps/"
-    "LPI_Imagery_Best/MapServer/WmsServer"
+# Esri World Imagery XYZ tiles — free, no API key required
+# Each tile is 256×256 px; we stitch a 3×3 grid per building
+# Resolution at Sydney lat −33.9°, zoom 19: ~0.25 m/px (lon), ~0.30 m/px (lat)
+ESRI_TILE_URL = (
+    "https://server.arcgisonline.com/ArcGIS/rest/services/"
+    "World_Imagery/MapServer/tile/{z}/{y}/{x}"
 )
-
-# Image resolution: target ~0.30 m/px (equivalent to Google Maps zoom 19)
-# At Sydney lat −33.9°: 1° lon ≈ 92,600 m, 1° lat ≈ 111,000 m
-WMS_IMAGE_WIDTH_PX = 640
-WMS_IMAGE_HEIGHT_PX = 640
-WMS_COVERAGE_METRES = 192  # square tile side length in metres
+ESRI_TILE_ZOOM = 19
+ESRI_TILE_GRID = 3        # NxN tile stitch per building (3 → 768×768 px, ~190m×230m)
+ESRI_TILE_SIZE_PX = 256   # Esri standard tile dimension
 
 # AEMO NEM data endpoints
 AEMO_BASE_URL = "https://visualisations.aemo.com.au/aemo/apps/api/report"

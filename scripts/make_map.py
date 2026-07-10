@@ -162,4 +162,4 @@ if __name__ == "__main__":
     m = make_map(df)
     m.save(str(OUT_HTML))
     print(f"Map saved → {OUT_HTML}")
-    print(f"\nOpen in Windows:\n  \\\\wsl.localhost\\Ubuntu-26.04\\home\\jr\\Warehouse-No-Solar-Sydney\\data\\warehouses_map.html")
+    print("\nOpen in Windows:\n  \\\\wsl.localhost\\Ubuntu-26.04\\home\\jr\\Warehouse-No-Solar-Sydney\\data\\warehouses_map.html")

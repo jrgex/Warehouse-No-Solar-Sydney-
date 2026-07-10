@@ -179,7 +179,7 @@ class TariffCalculator:
         print(f"  Effective rate             {r.cost_per_kwh_effective * 100:>11.2f}  c/kWh")
         if r.installable_kwp is not None:
             print(sep)
-            print(f"  SOLAR OPPORTUNITY")
+            print("  SOLAR OPPORTUNITY")
             print(f"  Installable capacity       {r.installable_kwp:>12,.1f}  kWp")
             print(f"  Estimated solar yield      {r.solar_annual_kwh:>12,.0f}  kWh/yr")
             print(f"  Annual bill saving         ${r.solar_annual_saving:>11,.2f}")

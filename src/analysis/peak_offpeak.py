@@ -14,7 +14,6 @@ Reference: Ausgrid Network Price List 2024-25, Table 4.
 import logging
 from typing import Union
 
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns

@@ -87,7 +87,7 @@ def run_live_detection(max_results: int = 50) -> None:
     from src.data_ingestion.warehouse_detector import WarehouseDetector
 
     image_dir = DATA_DIR / "images"
-    print(f"\nStarting live detection — Overpass API + NSW SIX Maps WMS")
+    print("\nStarting live detection — Overpass API + NSW SIX Maps WMS")
     print(f"Images will be cached to: {image_dir}\n")
 
     detector = WarehouseDetector(image_cache_dir=image_dir)

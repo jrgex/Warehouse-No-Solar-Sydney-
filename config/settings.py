@@ -4,7 +4,6 @@ Central configuration for the Warehouse No Solar Sydney project.
 No API keys are required for detection — Overpass (OSM) and NSW SIX Maps
 are both free public services.
 """
-import os
 from pathlib import Path
 from dotenv import load_dotenv
 

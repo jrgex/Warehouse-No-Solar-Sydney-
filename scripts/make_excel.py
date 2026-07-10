@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 from openpyxl import Workbook
 from openpyxl.styles import (
-    Alignment, Border, Font, GradientFill, PatternFill, Side
+    Alignment, Border, Font, PatternFill, Side
 )
 from openpyxl.utils import get_column_letter
 from openpyxl.formatting.rule import ColorScaleRule

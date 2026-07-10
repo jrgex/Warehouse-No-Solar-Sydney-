@@ -4,10 +4,9 @@ AEMO NEM interval data loader for NSW region.
 Downloads and parses 30-minute trading interval data from AEMO NEMWeb.
 Data format reference: https://www.nemweb.com.au/Reports/CURRENT/
 """
-import io
 import logging
 import zipfile
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -17,9 +16,7 @@ from tqdm import tqdm
 
 from config.settings import (
     AEMO_NEMWEB_URL,
-    NEM_INTERVAL_MINUTES,
     NEM_REGION,
-    PROCESSED_DATA_DIR,
     RAW_DATA_DIR,
 )
 
